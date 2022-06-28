@@ -1,0 +1,7 @@
+
+*.dll
+*.pdb
+*.cache
+*.txt
+*.CopyComplete
+.vs/CustomMusic/xs/UserPrefs.xml
