@@ -8,16 +8,16 @@ namespace CustomMusic
 {
     public static class MusicLoader
     {
-        private static readonly string musicBasePath = Path.Combine(Main.modFolder, "Music");
-        private static readonly string[] supportedExt = { ".mp3", ".wav", ".ogg", ".aiff" };
+        private static readonly string MusicBasePath = Path.Combine(Main.modFolder, "Music");
+        private static readonly string[] SupportedExt = { ".mp3", ".wav", ".ogg", ".aiff" };
 
         public static List<MusicTrack> LoadForScene(string sceneName)
         {
-            var path = Path.Combine(musicBasePath, sceneName);
+            var path = Path.Combine(MusicBasePath, sceneName);
             if (!Directory.Exists(path)) return new List<MusicTrack>();
 
             return Directory.GetFiles(path)
-                .Where(f => supportedExt.Contains(Path.GetExtension(f).ToLowerInvariant()))
+                .Where(f => SupportedExt.Contains(Path.GetExtension(f).ToLowerInvariant()))
                 .Select(f => new MusicTrack
                 {
                     clipName = f, // full path = trigger custom load
@@ -41,11 +41,6 @@ namespace CustomMusic
                     Create();
                 return instance;
             }
-        }
-
-        private static void Awake()
-        {
-            Create();
         }
 
         public static void Create()

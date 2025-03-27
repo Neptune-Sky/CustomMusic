@@ -1,13 +1,9 @@
-using System.Collections;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SFS.Audio;
 using UnityEngine;
-using UnityEngine.Networking;
-using Random = System.Random;
+
 // ReSharper disable InconsistentNaming
 
 namespace CustomMusic
@@ -31,7 +27,7 @@ namespace CustomMusic
             MusicPlaylist playlist = __instance.playlist;
             AudioSource source = __instance.source;
 
-            if (playlist == null || source == null || !source.isPlaying)
+            if (!playlist || !source || !source.isPlaying)
                 return;
 
             var currentTrack = ReflectionUtils.GetPrivateField<int>(__instance, "currentTrack");
