@@ -151,15 +151,17 @@ namespace CustomMusic
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"[CustomMusicMod] Failed to load custom track: {track.clipName} | Error: {www.error}");
+                Debug.LogError($"[CustomMusicMod] Failed to load track: {track.clipName} | Error: {www.error}");
                 SkipToNextTrack(player);
                 yield break;
             }
 
             AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-            if (!clip || clip.loadState == AudioDataLoadState.Failed)
+
+            // Validate that it's actually playable
+            if (!clip || clip.loadState != AudioDataLoadState.Loaded || clip.length <= 0)
             {
-                Debug.LogError($"[CustomMusicMod] Invalid or unsupported audio clip: {track.clipName}");
+                Debug.LogError($"[CustomMusicMod] Clip load failed or unsupported format: {track.clipName}");
                 SkipToNextTrack(player);
                 yield break;
             }
@@ -167,12 +169,14 @@ namespace CustomMusic
             AudioSource source = player.source;
             source.clip = clip;
             source.pitch = track.pitch;
+
             ReflectionUtils.SetPrivateField(player, "fadeTime", fadeTime);
             ReflectionUtils.SetPrivateField(player, "targetFadeVolume", 1f);
-            ReflectionUtils.SetPrivateField(player, "currentFadeVolume", 0f); // or preload to avoid ramp
+            ReflectionUtils.SetPrivateField(player, "currentFadeVolume", 0f);
 
-            var updateVolume = typeof(MusicPlaylistPlayer).GetMethod("UpdateVolume", BindingFlags.NonPublic | BindingFlags.Instance);
-            updateVolume?.Invoke(player, null);
+            typeof(MusicPlaylistPlayer)
+                .GetMethod("UpdateVolume", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.Invoke(player, null);
 
             source.Play();
         }
