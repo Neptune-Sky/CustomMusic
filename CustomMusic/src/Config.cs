@@ -27,9 +27,9 @@ namespace CustomMusic
 
         public class SettingsData
         {
-            public Bool_Local homeMenu = new();
-            public Bool_Local buildScene = new();
-            public Bool_Local worldScene = new();
+            public Bool_Local homeMenu = new () { Value = true }; 
+            public Bool_Local buildScene = new () { Value = true }; 
+            public Bool_Local worldScene = new () { Value = true }; 
         }
 
         private static GameObject MenuItems(Transform parent, Vector2Int size)
