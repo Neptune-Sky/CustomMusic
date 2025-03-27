@@ -15,7 +15,7 @@ namespace CustomMusic
                 return;
             
             MusicPlaylist playlist = player.playlist;
-            var customTracks = CustomMusicLoader.LoadForScene(sceneName);
+            var customTracks = MusicLoader.LoadForScene(sceneName);
 
             playlist.tracks = playlist.tracks
                 .Where(t => !File.Exists(t.clipName)) // keep vanilla only

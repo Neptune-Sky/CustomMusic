@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CustomMusic
 {
-    public static class CustomMusicLoader
+    public static class MusicLoader
     {
         private static readonly string musicBasePath = Path.Combine(Main.modFolder, "Music");
         private static readonly string[] supportedExt = { ".mp3", ".wav", ".ogg", ".aiff" };
