@@ -1,12 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using HarmonyLib;
 using SFS.Audio;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace CustomMusic
 {
@@ -41,7 +37,7 @@ namespace CustomMusic
         {
             get
             {
-                if (instance == null)
+                if (!instance)
                     Create();
                 return instance;
             }
@@ -54,7 +50,7 @@ namespace CustomMusic
 
         public static void Create()
         {
-            if (instance != null) return;
+            if (instance) return;
 
             var go = new GameObject("CustomMusicMod_CoroutineRunner");
             DontDestroyOnLoad(go);

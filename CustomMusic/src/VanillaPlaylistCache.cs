@@ -7,25 +7,23 @@ namespace CustomMusic
 {
     public static class VanillaPlaylistCache
     {
-        private static readonly Dictionary<MusicPlaylist, List<MusicTrack>> cache = new();
+        private static readonly Dictionary<MusicPlaylist, List<MusicTrack>> Cache = new();
 
         public static void CacheIfNeeded(MusicPlaylist playlist)
         {
-            if (!cache.ContainsKey(playlist))
-            {
-                // Only store non-custom tracks
-                var vanillaTracks = playlist.tracks
-                    .Where(t => !File.Exists(t.clipName))
-                    .Select(CloneTrack)
-                    .ToList();
+            if (Cache.ContainsKey(playlist)) return;
+            // Only store non-custom tracks
+            var vanillaTracks = playlist.tracks
+                .Where(t => !File.Exists(t.clipName))
+                .Select(CloneTrack)
+                .ToList();
 
-                cache[playlist] = vanillaTracks;
-            }
+            Cache[playlist] = vanillaTracks;
         }
 
         public static List<MusicTrack> GetCachedVanilla(MusicPlaylist playlist)
         {
-            return cache.TryGetValue(playlist, out var tracks) ? tracks : new List<MusicTrack>();
+            return Cache.TryGetValue(playlist, out var tracks) ? tracks : new List<MusicTrack>();
         }
 
         private static MusicTrack CloneTrack(MusicTrack track)

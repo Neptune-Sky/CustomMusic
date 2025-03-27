@@ -3,19 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SFS.Audio;
-using SFS.Variables;
 using UnityEngine;
 
 namespace CustomMusic
 {
     public static class MusicInjector
     {
-        public static void Inject(MusicPlaylistPlayer player, string sceneName)
+        private static void Inject(MusicPlaylistPlayer player, string sceneName)
         {
             if (!player || !player.playlist)
                 return;
             
-            var playlist = player.playlist;
+            MusicPlaylist playlist = player.playlist;
             var customTracks = CustomMusicLoader.LoadForScene(sceneName);
 
             playlist.tracks = playlist.tracks
@@ -45,22 +44,14 @@ namespace CustomMusic
             // Wait until MusicPlaylistPlayer is present in the scene
             yield return new WaitUntil(() =>
             {
-                player = UnityEngine.Object.FindObjectOfType<MusicPlaylistPlayer>();
-                return player != null;
+                player = Object.FindObjectOfType<MusicPlaylistPlayer>();
+                return player;
             });
             
             VanillaPlaylistCache.CacheIfNeeded(player.playlist);
 
             // Inject the correct playlist before StartPlaying is triggered
             Inject(player, sceneName);
-
-            // Log final playlist for debugging
-            var playlist = player.playlist;
-            for (int i = 0; i < playlist.tracks.Count; i++)
-            {
-                var t = playlist.tracks[i];
-                bool isCustom = File.Exists(t.clipName);
-            }
         }
         public static bool ShouldIncludeVanilla(string sceneName) => sceneName switch
         {
@@ -72,8 +63,8 @@ namespace CustomMusic
 
         public static void OnSceneToggleChanged(string sceneName)
         {
-            var players = UnityEngine.Object.FindObjectsOfType<MusicPlaylistPlayer>();
-            foreach (var p in players)
+            var players = Object.FindObjectsOfType<MusicPlaylistPlayer>();
+            foreach (MusicPlaylistPlayer p in players)
             {
                 if (p != null && p.playlist != null && p.gameObject.scene.name == sceneName)
                 {

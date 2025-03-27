@@ -3,16 +3,19 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using JetBrains.Annotations;
 using SFS.Audio;
 using UnityEngine;
 using UnityEngine.Networking;
 using Random = System.Random;
+// ReSharper disable InconsistentNaming
 
 namespace CustomMusic
 {
     [HarmonyPatch(typeof(MusicPlaylistPlayer), "StartPlaying")]
     public static class Patch_StartPlaying
     {
+        [UsedImplicitly]
         private static bool Prefix(MusicPlaylistPlayer __instance, float fadeTime)
         {
             // Prevent default logic and use ours
@@ -61,7 +64,7 @@ namespace CustomMusic
     public static class TrackPlayer
     {
         private static bool isSwitchingTracks = false;
-        private static readonly Random rng = new();
+        private static readonly Random Rng = new();
 
         public static bool TryPlayTrack(MusicPlaylistPlayer player, int? requestedIndex, float fadeTime)
         {
@@ -73,7 +76,7 @@ namespace CustomMusic
             isSwitchingTracks = true;
             
             MusicPlaylist playlist = player.playlist;
-            if (playlist == null || playlist.tracks.Count == 0)
+            if (!playlist || playlist.tracks.Count == 0)
             {
                 isSwitchingTracks = false;
                 return false;
@@ -106,9 +109,9 @@ namespace CustomMusic
 
         public static int GetNextValidTrack(MusicPlaylistPlayer player, int lastTrack)
         {
-            var playlist = player.playlist;
+            MusicPlaylist playlist = player.playlist;
             var scene = player.gameObject.scene.name;
-            bool allowVanilla = MusicInjector.ShouldIncludeVanilla(scene);
+            var allowVanilla = MusicInjector.ShouldIncludeVanilla(scene);
 
             // Build list of valid tracks
             var validIndices = playlist.tracks
@@ -123,7 +126,7 @@ namespace CustomMusic
             if (validIndices.Count == 1)
                 return validIndices[0];
 
-            bool doShuffle =
+            var doShuffle =
                 lastTrack == -1 || // first time playing
                 (lastTrack >= 0 &&
                  lastTrack < playlist.tracks.Count &&
@@ -133,12 +136,12 @@ namespace CustomMusic
             {
                 return validIndices
                     .Where(i => i != lastTrack)
-                    .OrderBy(_ => rng.Next())
+                    .OrderBy(_ => Rng.Next())
                     .First();
             }
 
             // Default: pick next in sequence, skipping same track if possible
-            int fallback = validIndices.FirstOrDefault(i => i != lastTrack);
+            var fallback = validIndices.FirstOrDefault(i => i != lastTrack);
             return fallback != -1 ? fallback : validIndices[0];
         }
 
@@ -165,22 +168,17 @@ namespace CustomMusic
         
         public static void SkipToNextTrack(MusicPlaylistPlayer player)
         {
-            Debug.Log("[CustomMusicMod] Skipping to next track due to failure...");
-            int current = GetCurrentTrack(player);
-            int next = GetNextValidTrack(player, current);
+            var current = GetCurrentTrack(player);
+            var next = GetNextValidTrack(player, current);
 
             if (next != -1 && next != current)
             {
                 TryPlayTrack(player, next, fadeTime: 1f);
             }
-            else
-            {
-                Debug.LogWarning("[CustomMusicMod] No valid track to skip to.");
-            }
         }
         private static IEnumerator PlayCustomTrack(MusicPlaylistPlayer player, MusicTrack track, float fadeTime)
         {
-            string url = "file://" + track.clipName.Replace("\\", "/");
+            var url = "file://" + track.clipName.Replace("\\", "/");
             AudioType type = GetAudioType(Path.GetExtension(track.clipName));
 
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, type))
@@ -195,7 +193,7 @@ namespace CustomMusic
                     yield break;
                 }
 
-                var clip = DownloadHandlerAudioClip.GetContent(www);
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
                 if (!clip || clip.loadState == AudioDataLoadState.Failed)
                 {
                     Debug.LogError($"[CustomMusicMod] Invalid or unsupported audio clip: {track.clipName}");
@@ -203,7 +201,7 @@ namespace CustomMusic
                     yield break;
                 }
 
-                var source = player.source;
+                AudioSource source = player.source;
                 source.clip = clip;
                 source.pitch = track.pitch;
                 CoroutineRunner.Instance.StartCoroutine(FadeInAndPlay(source, track.volume, fadeTime));

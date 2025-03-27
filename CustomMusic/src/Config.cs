@@ -2,7 +2,6 @@
 using SFS.IO;
 using SFS.UI.ModGUI;
 using SFS.Variables;
-using TMPro;
 using UITools;
 using UnityEngine;
 using static SFS.UI.ModGUI.Builder;
@@ -37,7 +36,7 @@ namespace CustomMusic
         {
             Box box = CreateBox(parent, size.x, size.y);
             box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 35, new RectOffset(15, 15, 15, 15));
-            int width = size.x - 60;
+            var width = size.x - 60;
             CreateLabel(box, size.x, 50, text: "Custom Music");
 
             Container scale = CreateContainer(box);
