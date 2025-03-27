@@ -18,7 +18,7 @@ namespace CustomMusic
         public override string DisplayName => "Custom Music";
         public override string Author => "NeptuneSky";
         public override string MinimumGameVersionNecessary => "1.5.10.2";
-        public override string ModVersion => "v2.0";
+        public override string ModVersion => "v2.0.1";
         public override string Description => "Simple mod that lets you import custom music.";
 
         public Dictionary<string, FilePath> UpdatableFiles => new()
