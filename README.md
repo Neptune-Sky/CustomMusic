@@ -1,7 +1,6 @@
 # CustomMusic
 A mod that allows loading of custom music into Spaceflight Simulator.
 
-This mod WILL NOT WORK with the old third-party modloader. You will need to be on a version of the game with the official modloader.
 # How to Use
 
 **NOTE:** Music files must be in mp3, ogg, wav, or aiff format.
