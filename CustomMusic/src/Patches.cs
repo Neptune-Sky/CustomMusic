@@ -22,6 +22,7 @@ namespace CustomMusic
     [HarmonyPatch(typeof(MusicPlaylistPlayer), "Update")]
     public static class Patch_MusicPlaylistPlayer_Update
     {
+        [UsedImplicitly]
         private static void Postfix(MusicPlaylistPlayer __instance)
         {
             MusicPlaylist playlist = __instance.playlist;
@@ -43,10 +44,7 @@ namespace CustomMusic
             var isCustom = File.Exists(track.clipName);
             var allowVanilla = MusicInjector.ShouldIncludeVanilla(__instance.gameObject.scene.name);
 
-            if (!isCustom && !allowVanilla)
-            {
-                TrackPlayer.TryPlayTrack(__instance, null, 1f);
-            }
+            if (!isCustom && !allowVanilla) TrackPlayer.TryPlayTrack(__instance, null, 1f);
         }
     }
 }

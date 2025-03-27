@@ -11,9 +11,8 @@ namespace CustomMusic
 {
     public class Config : ModSettings<Config.SettingsData>
     {
-        protected override FilePath SettingsFile => Main.modFolder.ExtendToFile("Config.txt");
-
         private static Config main;
+        protected override FilePath SettingsFile => Main.modFolder.ExtendToFile("Config.txt");
 
         public static void Load()
         {
@@ -23,13 +22,6 @@ namespace CustomMusic
             {
                 ("Config", transform1 => MenuItems(transform1, ConfigurationMenu.ContentSize))
             });
-        }
-
-        public class SettingsData
-        {
-            public Bool_Local homeMenu = new () { Value = true }; 
-            public Bool_Local buildScene = new () { Value = true }; 
-            public Bool_Local worldScene = new () { Value = true }; 
         }
 
         private static GameObject MenuItems(Transform parent, Vector2Int size)
@@ -66,6 +58,13 @@ namespace CustomMusic
         protected override void RegisterOnVariableChange(Action onChange)
         {
             Application.quitting += onChange;
+        }
+
+        public class SettingsData
+        {
+            public Bool_Local buildScene = new() { Value = true };
+            public Bool_Local homeMenu = new() { Value = true };
+            public Bool_Local worldScene = new() { Value = true };
         }
     }
 }

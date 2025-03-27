@@ -14,6 +14,19 @@ namespace CustomMusic
     [UsedImplicitly]
     public class Main : Mod, IUpdatable
     {
+        private static Harmony patcher;
+
+        public static FolderPath modFolder;
+
+
+        private static readonly string[] SceneFolders =
+        {
+            "Home_PC",
+            "Build_PC",
+            "World_PC"
+        };
+
+        private Coroutine activeInjectionCoroutine;
         public override string ModNameID => "CustomMusic";
         public override string DisplayName => "Custom Music";
         public override string Author => "NeptuneSky";
@@ -29,34 +42,17 @@ namespace CustomMusic
             }
         };
 
-        private static Harmony patcher;
-
-        public static FolderPath modFolder;
-
-
-        private static readonly string[] SceneFolders = {
-            "Home_PC",
-            "Build_PC",
-            "World_PC"
-        };
-
         private void EnsureDirectoriesExist()
         {
             var musicDir = Path.Combine(ModFolder, "Music");
             try
             {
-                if (!Directory.Exists(musicDir))
-                {
-                    Directory.CreateDirectory(musicDir);
-                }
+                if (!Directory.Exists(musicDir)) Directory.CreateDirectory(musicDir);
 
                 foreach (var scene in SceneFolders)
                 {
                     var subfolder = Path.Combine(musicDir, scene);
-                    if (!Directory.Exists(subfolder))
-                    {
-                        Directory.CreateDirectory(subfolder);
-                    }
+                    if (!Directory.Exists(subfolder)) Directory.CreateDirectory(subfolder);
                 }
             }
             catch (Exception ex)
@@ -64,29 +60,29 @@ namespace CustomMusic
                 Debug.LogError($"[CustomMusicMod] Failed to create music directories: {ex}");
             }
         }
-        private Coroutine activeInjectionCoroutine;
+
         public override void Early_Load()
         {
             modFolder = new FolderPath(ModFolder);
             EnsureDirectoriesExist();
 
             Config.Load();
-            
+
             patcher = new Harmony("mods.NeptuneSky.CustomMusic");
             patcher.PatchAll();
             CoroutineRunner.Create();
-            
+
             SceneHelper.OnSceneLoaded += scene =>
             {
                 if (activeInjectionCoroutine != null)
                     CoroutineRunner.Instance.StopCoroutine(activeInjectionCoroutine);
-                activeInjectionCoroutine = CoroutineRunner.Instance.StartCoroutine(MusicInjector.InjectAfterSceneLoad(scene.name));
+                activeInjectionCoroutine =
+                    CoroutineRunner.Instance.StartCoroutine(MusicInjector.InjectAfterSceneLoad(scene.name));
             };
         }
 
         public override void Load()
         {
-            
         }
     }
 }

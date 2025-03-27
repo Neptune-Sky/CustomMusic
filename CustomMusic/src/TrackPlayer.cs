@@ -16,13 +16,10 @@ namespace CustomMusic
 
         public static bool TryPlayTrack(MusicPlaylistPlayer player, int? requestedIndex, float fadeTime)
         {
-            if (isSwitchingTracks)
-            {
-                return false;
-            }
+            if (isSwitchingTracks) return false;
 
             isSwitchingTracks = true;
-            
+
             MusicPlaylist playlist = player.playlist;
             if (!playlist || playlist.tracks.Count == 0)
             {
@@ -50,7 +47,7 @@ namespace CustomMusic
                 CoroutineRunner.Instance.StartCoroutine(PlayCustomTrack(player, track, fadeTime));
             else
                 PlayVanilla(player, track, fadeTime);
-            
+
             isSwitchingTracks = false;
             return true;
         }
@@ -83,12 +80,10 @@ namespace CustomMusic
                  playlist.tracks[lastTrack].onTrackEnd == MusicTrack.OnTrackEnd.PlayRandom);
 
             if (doShuffle)
-            {
                 return validIndices
                     .Where(i => i != lastTrack)
                     .OrderBy(_ => Rng.Next())
                     .First();
-            }
 
             // Default: pick next in sequence, skipping same track if possible
             var fallback = validIndices.FirstOrDefault(i => i != lastTrack);
@@ -121,7 +116,7 @@ namespace CustomMusic
             ReflectionUtils.SetPrivateField(player, "currentFadeVolume", 0f); // start silent and let vanilla fade it in
 
             // Call UpdateVolume once immediately to initialize volume state
-            var updateVolume = typeof(MusicPlaylistPlayer)
+            MethodInfo updateVolume = typeof(MusicPlaylistPlayer)
                 .GetMethod("UpdateVolume", BindingFlags.NonPublic | BindingFlags.Instance);
             updateVolume?.Invoke(player, null);
 
@@ -133,11 +128,9 @@ namespace CustomMusic
             var current = GetCurrentTrack(player);
             var next = GetNextValidTrack(player, current);
 
-            if (next != -1 && next != current)
-            {
-                TryPlayTrack(player, next, fadeTime: 1f);
-            }
+            if (next != -1 && next != current) TryPlayTrack(player, next, 1f);
         }
+
         private static IEnumerator PlayCustomTrack(MusicPlaylistPlayer player, MusicTrack track, float fadeTime)
         {
             var url = "file://" + track.clipName.Replace("\\", "/");
