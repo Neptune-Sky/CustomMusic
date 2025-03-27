@@ -37,8 +37,7 @@ namespace CustomMusic
         public static FolderPath modFolder;
 
 
-        private static readonly string[] SceneFolders = new[]
-        {
+        private static readonly string[] SceneFolders = {
             "Home_PC",
             "Build_PC",
             "World_PC"
@@ -68,7 +67,7 @@ namespace CustomMusic
                 Debug.LogError($"[CustomMusicMod] Failed to create music directories: {ex}");
             }
         }
-
+        private Coroutine activeInjectionCoroutine;
         public override void Early_Load()
         {
             modFolder = new FolderPath(ModFolder);
@@ -80,9 +79,11 @@ namespace CustomMusic
             patcher.PatchAll();
             CoroutineRunner.Create();
             
-            SceneHelper.OnSceneLoaded += (scene) =>
+            SceneHelper.OnSceneLoaded += scene =>
             {
-                CoroutineRunner.Instance.StartCoroutine(MusicInjector.InjectAfterSceneLoad(scene.name));
+                if (activeInjectionCoroutine != null)
+                    CoroutineRunner.Instance.StopCoroutine(activeInjectionCoroutine);
+                activeInjectionCoroutine = CoroutineRunner.Instance.StartCoroutine(MusicInjector.InjectAfterSceneLoad(scene.name));
             };
         }
 

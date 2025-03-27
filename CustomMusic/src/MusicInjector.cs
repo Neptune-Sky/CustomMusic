@@ -38,21 +38,35 @@ namespace CustomMusic
         
         public static IEnumerator InjectAfterSceneLoad(string sceneName)
         {
+            Debug.Log($"[CustomMusicMod] Waiting for MusicPlaylistPlayer in scene: {sceneName}");
 
             MusicPlaylistPlayer player = null;
-
-            // Wait until MusicPlaylistPlayer is present in the scene
             yield return new WaitUntil(() =>
             {
                 player = Object.FindObjectOfType<MusicPlaylistPlayer>();
                 return player;
             });
-            
-            VanillaPlaylistCache.CacheIfNeeded(player.playlist);
 
-            // Inject the correct playlist before StartPlaying is triggered
+            if (!player || !player.playlist)
+            {
+                Debug.LogWarning("[CustomMusicMod] Aborted: player or playlist became null after wait");
+                yield break;
+            }
+
+            // Prevent duplicate inject
+            if (player.playlist.tracks.Count > 0 &&
+                player.playlist.tracks.Any(t => File.Exists(t.clipName)))
+            {
+                Debug.Log("[CustomMusicMod] Skipping inject: playlist already contains custom tracks");
+                yield break;
+            }
+
+            VanillaPlaylistCache.CacheIfNeeded(player.playlist);
             Inject(player, sceneName);
+
+            Debug.Log($"[CustomMusicMod] Final injected playlist: {player.playlist.tracks.Count} tracks");
         }
+
         public static bool ShouldIncludeVanilla(string sceneName) => sceneName switch
         {
             "Home_PC" => Config.settings.homeMenu.Value,

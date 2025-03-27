@@ -63,7 +63,7 @@ namespace CustomMusic
 
     public static class TrackPlayer
     {
-        private static bool isSwitchingTracks = false;
+        private static bool isSwitchingTracks;
         private static readonly Random Rng = new();
 
         public static bool TryPlayTrack(MusicPlaylistPlayer player, int? requestedIndex, float fadeTime)
